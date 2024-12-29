@@ -1,26 +1,67 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  ChakraProvider,
+  theme,
+  Flex,
+  Grid,
+  GridItem,
+} from "@chakra-ui/react"
+import { Navigate, Route, Routes } from "react-router-dom"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+import NavBar from "./components/navbar/NavBar";
+import LoginPage from "./pages/login/LoginPage"
+import HomePage from "./pages/homepage/HomePage";
+import UsersPage from "./pages/user/UsersPage";
+import ProtectedRoute from "./components/protectedroute/ProtectedRoute";
+import { useAppSelector } from "./hooks"
+import { selectAuthState } from "./slices/auth"
+
+export const App = () => {
+  const { isUserLoggedIn, loggedUser } = useAppSelector(selectAuthState);
+
+  return <ChakraProvider theme={theme}>
+    <Flex p="0px 20px">
+      { !isUserLoggedIn ? <LoginPage/> :
+        <Grid
+          templateColumns='repeat(5, 1fr)'
+          templateRows='repeat(12, 1fr)'
+          h='100vh'
+          w='100%'
+          gap={5}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+          <GridItem
+            rowSpan={1}
+            colSpan={5}
+            display='flex'
+            alignItems='center'
+            h='10vh'
+          >
+            <NavBar />
+          </GridItem>
+          <Routes>
+            <Route path="/" element={ <Navigate to="/home" /> }/>
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isUserLoggedIn}
+                  role={loggedUser?.role || ''}
+                  path="/home"
+                  children={<HomePage />}
+                />
+            }/>
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isUserLoggedIn}
+                  role={loggedUser?.role || ''}
+                  path="/users"
+                  children={<UsersPage />}
+                />
+            }/>
+          </Routes>
+        </Grid>
+      }
+    </Flex>
+  </ChakraProvider>
 }
-
-export default App;
