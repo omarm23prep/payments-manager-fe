@@ -20,10 +20,9 @@ import { logout, selectAuthState } from '../../slices/auth';
 export interface NavBarProps extends FlexProps {}
 
 const NAVBAR_OPTIONS = [
-  { name: 'Menú', path: '/home'},
-  { name: 'Billar', path: '/billiard'},
+  { name: 'Inicio', path: '/home'},
+  { name: 'Servicios', path: '/services'},
   { name: 'Ordenes', path: '/orders'},
-  { name: 'Productos', path: '/products'},
   { name: 'Usuarios', path: '/users'},
 ];
 
@@ -58,7 +57,7 @@ const NavBar: React.FC<NavBarProps> = () => {
     <Flex flex={1}>
       <HStack>
         <Heading>
-          Bola Ocho
+          Loma Bonita, Oax
         </Heading>
       </HStack>
       <HStack justify='flex-end' flex={2}>

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { RootState } from "../store";
 
 export interface IUser {
+  id?: string,
   fullname: string,
   username: string
   password?: string,
@@ -12,6 +13,8 @@ export interface IUser {
   age?: number,
   isAuthenticated?: boolean,
 }
+
+type UserModel = IUser & { _id: string };
 
 export interface Credentials {
   username: string,
@@ -48,20 +51,37 @@ export const createUser = createAsyncThunk(
     }
 });
 
-export const login = createAsyncThunk(
-  "user/login",
-  async (credentials: Credentials) => {
+export const updateUser = createAsyncThunk(
+  "user/update",
+  async (user: IUser) => {
     try {
-      const response = await axios.post(`${config.BILLIARDS_BE_API_ENDPOINT}/login`, {
-        ...credentials,
+      const response = await axios.patch(`${config.BILLIARDS_BE_API_ENDPOINT}/users/${user.id}`, {
+        fullname: user.fullname,
+        username: user.username,
+        email: user.email,
+        password: user.password,
+        role: user.role,
       });
 
-      console.log("data", response.data);
-      return response.data;
+      console.log("updated user", response);
     } catch (error: unknown) {
-      console.error("ERROR WHEN LOGGING USER", error);
+      console.error(error);
     }
-});
+  }
+);
+
+export const removeUser = createAsyncThunk(
+  "user/delete",
+  async (userId: string) => {
+    try {
+      const response = await axios.delete(`${config.BILLIARDS_BE_API_ENDPOINT}/users/${userId}`);
+
+      console.log("removed user", response);
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  }
+);
 
 export const getUsers = createAsyncThunk(
   "user/listAll",
@@ -69,8 +89,10 @@ export const getUsers = createAsyncThunk(
     try {
       const response = await axios.get(`${config.BILLIARDS_BE_API_ENDPOINT}/users`);
       const usersData = response.data.data;
-      return usersData.map((user: IUser ) => {
+
+      return usersData.map((user: UserModel ) => {
         return {
+          id: user._id,
           fullname: user.fullname,
           username: user.username,
           password: "*********",
@@ -98,28 +120,13 @@ const user = createSlice({
     [createUser.rejected.type]: (state) => {
       return { ...state }
     },
-    [login.pending.type]: (state) => {
+    [updateUser.pending.type]: (state) => {
       return { ...state }
     },
-    [login.fulfilled.type]: (state, action) => {
-      const { fullname, username, email, role, age } = action.payload;
-      sessionStorage.setItem('username', username);
-      sessionStorage.setItem('fullname', fullname);
-      sessionStorage.setItem('role', role);
-
-      return {
-        ...state,
-        loggedUser: {
-          fullname,
-          username,
-          email,
-          role,
-          age,
-          isAuthenticated: fullname ? true: false
-        }
-      }
+    [updateUser.fulfilled.type]: (state) => {
+      return { ...state }// change state to be updated immediately
     },
-    [login.rejected.type]: (state) => {
+    [updateUser.rejected.type]: (state) => {
       return { ...state }
     },
     [getUsers.pending.type]: (state) => {

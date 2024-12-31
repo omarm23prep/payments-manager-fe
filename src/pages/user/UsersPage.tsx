@@ -1,27 +1,32 @@
 import {
-  Button,
   Flex,
-  FormControl,
-  FormLabel,
   GridItem,
   Heading,
   Input,
-  Select,
   Table,
   TableContainer,
-  Text,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
-  useToast
+  useToast,
+  InputGroup,
+  InputLeftElement,
+  Box,
+  IconButton,
+  Link,
+  Icon
 } from "@chakra-ui/react"
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useForm } from "react-hook-form";
-import { createUser, getUsers, selectUserState } from "../../slices/user";
+import { createUser, getUsers, IUser, selectUserState } from "../../slices/user";
 import { AxiosError, AxiosResponse, isAxiosError } from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { AddIcon, SearchIcon } from "@chakra-ui/icons";
+import UserDrawer from "../../components/users/UsersDrawer";
+import { useDrawer } from "../../hooks/useDrawer";
+import { FaRegEye } from "react-icons/fa";
 
 type FormData = {
   fullname: string;
@@ -34,8 +39,18 @@ type FormData = {
 const UsersPage = () => {
   const dispatch = useAppDispatch();
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDrawer();
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
   const { users } = useAppSelector(selectUserState);
+  const [selectedUser, setSelectedUser] = useState<IUser>({
+    "id": "",
+    "fullname": "",
+    "username": "",
+    "password": "",
+    "email": "",
+    "role": "",
+  });
+
 
   useEffect(() => {
     dispatch(getUsers())
@@ -83,80 +98,24 @@ const UsersPage = () => {
   });
 
   return <>
-    <GridItem
-      colSpan={5}
-      margin='40px'
-    >
-      <Flex justifyContent="space-between" position="relative">
-        <Heading fontSize='3xl'>Usuarios</Heading>
+    <GridItem colSpan={5}>
+      <Heading size="md">Usuarios</Heading>
+    </GridItem>
+    <GridItem colSpan={1}></GridItem>
+    <GridItem colSpan={3}>
+      <Flex alignItems="center" mb="50px">
+        <InputGroup>
+          <InputLeftElement pointerEvents='none'>
+            <SearchIcon color='gray.300' />
+            </InputLeftElement>
+            <Input type='tel' placeholder='Buscar usuario' />
+          </InputGroup>
       </Flex>
-    </GridItem>
-    <GridItem
-      colSpan={3}
-      display='flex'
-      flexDir='column'
-    >
-      <form onSubmit={handleCreateButton} autoComplete="off">
-        <FormControl isRequired mb='5px'>
-          <FormLabel>Nombre</FormLabel>
-          <Input
-            placeholder='Nombre completo'
-            {...register('fullname', { required: 'Por favor agrega el nombre del producto', minLength: 5 })}
-          />
-          {errors.fullname &&
-          <Text
-            fontStyle='italic'
-            fontSize='xs'
-            color='red'
-          >
-            {errors.fullname.message}
-          </Text>}
-        </FormControl>
-        <FormControl isRequired mb='5px'>
-          <FormLabel>Usuario</FormLabel>
-          <Input
-            placeholder='Nombre de usuario'
-            {...register('username', { required: 'Por favor agrega el nombre de usuario', minLength: 5 })}
-          />
-        </FormControl>
-        <FormControl isRequired mb='5px'>
-          <FormLabel>Contraseña</FormLabel>
-          <Input
-            type='password'
-            autoComplete="current-password"
-            {...register('password', { required: 'Por favor agrega la contraseña', minLength: 5 })}
-          />
-        </FormControl>
-        <FormControl isRequired mb='5px'>
-          <FormLabel>Correo</FormLabel>
-          <Input
-            type='email' placeholder='Correo electrónico'
-            {...register('email', { required: 'Por favor agrega el correo', minLength: 5 })}
-          />
-        </FormControl>
-        <FormControl isRequired mb='15px'>
-          <FormLabel>Cargo</FormLabel>
-            <Select
-              placeholder='Selecciona un tipo'
-              {...register('role', { required: 'Por favor agrega elige el tipo de usuario', minLength: 5 })}
-            >
-              <option value="admin">Administrador</option>
-              <option value="cashier">Cajero</option>
-              <option value="waiter">Mesero</option>
-            </Select>
-        </FormControl>
-        <Flex justifyContent='space-around'>
-          <Button type="submit" colorScheme='green'>Agregar</Button>
-          <Button colorScheme='blue' disabled>Editar</Button>
-          <Button colorScheme='red' disabled>Eliminar</Button>
-        </Flex>
-      </form>
-    </GridItem>
-    <GridItem colSpan={2}>
       <TableContainer>
         <Table variant='simple'>
           <Thead>
             <Tr>
+              <Th>Editar</Th>
               <Th>Nombre</Th>
               <Th>Usuario</Th>
               <Th>Tipo</Th>
@@ -167,6 +126,24 @@ const UsersPage = () => {
               users.map((user) => {
                 return (
                   <Tr key={user.email}>
+                    <Td>
+                      <Link
+                        as='button'
+                        onClick={() => {
+                          setSelectedUser({
+                            id: user.id,
+                            fullname: user.fullname,
+                            username: user.username,
+                            password: user.password ?? "",
+                            email: user.email,
+                            role: user.role
+                          });
+                          onOpen();
+                        }}
+                      >
+                        <Icon as={FaRegEye} />
+                      </Link>
+                    </Td>
                     <Td>{user.fullname}</Td>
                     <Td>{user.username}</Td>
                     <Td>{user.role}</Td>
@@ -177,6 +154,43 @@ const UsersPage = () => {
           </Tbody>
         </Table>
       </TableContainer>
+    </GridItem>
+    <GridItem colSpan={1}>
+      <Box position='absolute' bottom={10} right={10}>
+        <IconButton
+          aria-label='Add button'
+          borderRadius='full'
+          colorScheme='purple'
+          size='lg'
+          shadow='lg'
+          zIndex='1000'
+          icon={<AddIcon />}
+          onClick={onOpen}
+        />
+      </Box>
+      <UserDrawer
+        isOpen={isOpen}
+        isNewUser={selectedUser.username !== "" ? false : true}
+        onClose={() => {
+          setSelectedUser({
+            fullname: '',
+            username: '',
+            email: '',
+            password: '',
+            role: '',
+          })
+          onClose();
+        }}
+        user={{
+          id: selectedUser.id,
+          fullname: selectedUser.fullname,
+          username: selectedUser.username,
+          email: selectedUser.email,
+          password: selectedUser.password ?? "",
+          role: selectedUser.role,
+          age: 0,
+        }}
+      />
     </GridItem>
   </>
 }
