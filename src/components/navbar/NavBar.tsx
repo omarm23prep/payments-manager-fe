@@ -19,12 +19,7 @@ import { logout, selectAuthState } from '../../slices/auth';
 
 export interface NavBarProps extends FlexProps {}
 
-const NAVBAR_OPTIONS = [
-  { name: 'Inicio', path: '/home'},
-  { name: 'Servicios', path: '/services'},
-  { name: 'Ordenes', path: '/orders'},
-  { name: 'Usuarios', path: '/users'},
-];
+const NAVBAR_OPTIONS: any[] = [];
 
 
 const ProfileMenu = () => {

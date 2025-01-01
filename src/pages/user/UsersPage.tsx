@@ -16,7 +16,8 @@ import {
   Box,
   IconButton,
   Link,
-  Icon
+  Icon,
+  Grid
 } from "@chakra-ui/react"
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useForm } from "react-hook-form";
@@ -97,7 +98,7 @@ const UsersPage = () => {
     }
   });
 
-  return <>
+  return <Grid w="1138px">
     <GridItem colSpan={5}>
       <Heading size="md">Usuarios</Heading>
     </GridItem>
@@ -192,7 +193,7 @@ const UsersPage = () => {
         }}
       />
     </GridItem>
-  </>
+  </Grid>
 }
 
 export default UsersPage;

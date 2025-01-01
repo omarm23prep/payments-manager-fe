@@ -8,11 +8,11 @@ export const login = createAsyncThunk(
   "auth/login",
   async (credentials: Credentials) => {
     try {
-      const response = await axios.post(`${config.BILLIARDS_BE_API_ENDPOINT}/auth/login`, {
+      const response = await axios.post(`${config.PAYMENTS_MANAGER_API}/auth/login`, {
         ...credentials,
       });
 
-      console.log("env var", config.BILLIARDS_BE_API_ENDPOINT);
+      console.log("env var", config.PAYMENTS_MANAGER_API);
 
       // const response = await axios.post("http://localhost:3001/auth/login", {
       //   ...credentials,
@@ -29,7 +29,7 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async () => {
     try {
-      const response = await axios.post(`${config.BILLIARDS_BE_API_ENDPOINT}/auth/logout`);
+      const response = await axios.post(`${config.PAYMENTS_MANAGER_API}/auth/logout`);
       console.log("data", response.data);
     } catch (error: unknown) {
 

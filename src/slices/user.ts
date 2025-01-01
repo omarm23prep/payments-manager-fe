@@ -40,7 +40,7 @@ export const createUser = createAsyncThunk(
   "user/create",
   async (user: IUser) => {
     try {
-      const response = await axios.post(`${config.BILLIARDS_BE_API_ENDPOINT}/users`, {
+      const response = await axios.post(`${config.PAYMENTS_MANAGER_API}/users`, {
         ...user,
       });
       console.log("USER CREATED", response);
@@ -55,7 +55,7 @@ export const updateUser = createAsyncThunk(
   "user/update",
   async (user: IUser) => {
     try {
-      const response = await axios.patch(`${config.BILLIARDS_BE_API_ENDPOINT}/users/${user.id}`, {
+      const response = await axios.patch(`${config.PAYMENTS_MANAGER_API}/users/${user.id}`, {
         fullname: user.fullname,
         username: user.username,
         email: user.email,
@@ -74,7 +74,7 @@ export const removeUser = createAsyncThunk(
   "user/delete",
   async (userId: string) => {
     try {
-      const response = await axios.delete(`${config.BILLIARDS_BE_API_ENDPOINT}/users/${userId}`);
+      const response = await axios.delete(`${config.PAYMENTS_MANAGER_API}/users/${userId}`);
 
       console.log("removed user", response);
     } catch (error: unknown) {
@@ -87,7 +87,7 @@ export const getUsers = createAsyncThunk(
   "user/listAll",
   async () => {
     try {
-      const response = await axios.get(`${config.BILLIARDS_BE_API_ENDPOINT}/users`);
+      const response = await axios.get(`${config.PAYMENTS_MANAGER_API}/users`);
       const usersData = response.data.data;
 
       return usersData.map((user: UserModel ) => {

@@ -1,3 +1,5 @@
+import UnauthorizePage from "../../pages/unauthorize/UnauthorizePage";
+
 interface ProtectedRoutesProps {
   isAuthenticated: boolean,
   role: string,
@@ -6,8 +8,8 @@ interface ProtectedRoutesProps {
 }
 
 const ROLES_PERMISSIONS: any = {
-  "admin": ['/home', '/users', '/billiard', '/orders', '/products'],
-  "cashier": ['/home', '/billiard', '/orders'],
+  "admin": ['/home', '/users', '/predial', '/orders', '/services'],
+  "cashier": ['/home', '/predial', '/ordservicesers'],
   "waiter": ['/home', '/orders'],
 }
 
@@ -20,7 +22,7 @@ const ProtectedRoute = ({
 
   if (isAuthenticated && ROLES_PERMISSIONS[role].includes(path)) return children;
 
-  return <h3>You don't have access to this page</h3>
+  return <UnauthorizePage />
 }
 
 export default ProtectedRoute;
