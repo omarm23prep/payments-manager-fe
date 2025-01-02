@@ -14,7 +14,7 @@ import {
 import { FiMenu} from 'react-icons/fi';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from '../../pages/homepage/HomePage';
-import PredialPage from '../../pages/predial/PrediosPage';
+import ContribuyentesPage from '../../pages/predial/ContribuyentesPage';
 import UsersPage from '../../pages/user/UsersPage';
 import ProtectedRoute from '../protectedroute/ProtectedRoute';
 import { useAppSelector } from '../../hooks';
@@ -129,13 +129,13 @@ const Sidebar: React.FC<SidebarProps> = ({ links }) => {
               />
           }/>
           <Route
-            path="/predial"
+            path="/contribuyentes"
             element={
               <ProtectedRoute
                 isAuthenticated={isUserLoggedIn}
                 role={loggedUser?.role || ''}
-                path="/predial"
-                children={<PredialPage />}
+                path="/contribuyentes"
+                children={<ContribuyentesPage />}
               />
           }/>
           <Route

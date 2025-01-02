@@ -28,22 +28,24 @@ import {
   useDisclosure
 } from "@chakra-ui/react";
 import { FaRegEye } from "react-icons/fa";
-import { getDetailsByCuenta, getPredios, IPredio, IPredioDetails, selectPredioState } from "../../slices/predio";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useEffect, useState } from "react";
 import PredioDetails from "../../components/PredioDetails/PredioDetails";
+import { getContribuyentes, IContribuyente, selectContribuyentesState } from "../../slices/contribuyentes";
+import DebtMonths from "../../components/debtmonths/DebtMonths";
 
 const PredialPage = () => {
   const dispatch = useAppDispatch();
-  const { predios, loading, error } = useAppSelector(selectPredioState);
+  const { contribuyentes, loading, error } = useAppSelector(selectContribuyentesState);
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [selectedPredio, setSelectedPredio] = useState<IPredioDetails | null>(null);
+  const [selectedContribuyente, setSelectedContribuyente] = useState<IContribuyente | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const paymentDisclousure = useDisclosure();
 
   useEffect(() => {
-    dispatch(getPredios());
+    dispatch(getContribuyentes());
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,31 +53,29 @@ const PredialPage = () => {
     setCurrentPage(1);
   };
 
-  const handleViewDetails = async (predio: IPredio) => {
-    const response = await getDetailsByCuenta(predio.cuenta || 0);
-    const predialDetails: IPredioDetails = response.data;
-    setSelectedPredio(predialDetails);
+  const handleViewDetails = async (contribuyente: IContribuyente) => {
+    setSelectedContribuyente(contribuyente);
     onOpen();
   };
 
   // Filtrar predios
-  const filteredPredios = predios.filter((predio) => {
+  const filteredContribuyentes = contribuyentes.filter((contribuyente: IContribuyente) => {
     if (searchValue === "") return true;
     const searchLower = searchValue.toLowerCase();
     return (
-      predio.cuenta?.toString().startsWith(searchValue) ||
-      predio.lote?.toLowerCase().includes(searchLower) ||
-      predio.ubicacion?.toLowerCase().includes(searchLower)
+      contribuyente.contribuyente.toLowerCase().startsWith(searchValue.toLowerCase()) ||
+      contribuyente.predio.cuentaCatastral?.toLowerCase().includes(searchLower) ||
+      contribuyente.predio.direccion.direccionCompleta.toLowerCase().includes(searchLower)
     );
   });
 
   // Calcular los índices de la paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredPredios.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredContribuyentes.slice(indexOfFirstItem, indexOfLastItem);
 
   // Cambiar página
-  const totalPages = Math.ceil(filteredPredios.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredContribuyentes.length / itemsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -88,6 +88,11 @@ const PredialPage = () => {
       setCurrentPage((prev) => prev - 1);
     }
   };
+
+  const handlePayButton = () => {
+    onClose();
+    paymentDisclousure.onOpen();
+  }
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -115,23 +120,32 @@ const PredialPage = () => {
           <Table variant="simple">
             <Thead>
               <Tr>
+                {/* <Th>Datos Generales</Th> */}
+                <Th>Contribuyente</Th>
+                <Th>Estatus</Th>
+                {/* <Th>Dirección</Th> */}
                 <Th>Detalles</Th>
-                <Th>Cuenta</Th>
-                <Th>Lote</Th>
-                <Th>Ubicación</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {currentItems.map((predio) => (
-                <Tr key={`${predio.cuenta}`}>
+              {currentItems.map((contribuyente: IContribuyente) => (
+                <Tr key={`${contribuyente.id}`}>
+                  {/* <Td>{contribuyente.predio.fechaAdeudo}</Td> */}
+                  <Td>{contribuyente.contribuyente}</Td>
+                  <Td>{contribuyente.estatus}</Td>
+                  <Td
+                    maxW="200px"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                    whiteSpace="nowrap"
+                  >
+                    {contribuyente.predio.direccion.direccionCompleta}
+                  </Td>
                   <Td>
-                    <Link as="button" onClick={() => handleViewDetails(predio)}>
+                    <Link as="button" onClick={() => handleViewDetails(contribuyente)}>
                       <Icon as={FaRegEye} />
                     </Link>
                   </Td>
-                  <Td>{predio.cuenta}</Td>
-                  <Td>{predio.lote}</Td>
-                  <Td>{predio.ubicacion}</Td>
                 </Tr>
               ))}
             </Tbody>
@@ -159,11 +173,44 @@ const PredialPage = () => {
           <ModalHeader>Detalles del Predio</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <PredioDetails {...selectedPredio} />
+            <PredioDetails
+              id={parseInt(selectedContribuyente?.id || '', 10)}
+              contribuyente={selectedContribuyente?.contribuyente || ""}
+              cuentaCatastral={selectedContribuyente?.predio.cuentaCatastral || ""}
+              baseGravable={selectedContribuyente?.predio.baseGravable || 0}
+              fechaCelebracion={selectedContribuyente?.predio.fechaCelebracion || ""}
+              fechaAdeudo={selectedContribuyente?.predio.fechaAdeudo || ""}
+              direccion={selectedContribuyente?.predio.direccion || {id: 0, direccionCompleta: ""}}
+            />
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter display="flex" justifyContent="space-between">
             <Button colorScheme="blue" onClick={onClose}>
               Cerrar
+            </Button>
+            <Button colorScheme="green" onClick={handlePayButton}>
+              Pagar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={paymentDisclousure.isOpen} onClose={paymentDisclousure.onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Detalles del Predio</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <DebtMonths
+              fechaAdeudo={selectedContribuyente?.predio.fechaAdeudo}
+              baseGravable={selectedContribuyente?.predio.baseGravable}
+            />
+          </ModalBody>
+          <ModalFooter display="flex" justifyContent="space-between">
+            <Button colorScheme="blue" onClick={paymentDisclousure.onClose}>
+              Cerrar
+            </Button>
+            <Button colorScheme="green" onClick={handlePayButton}>
+              Cobrar
             </Button>
           </ModalFooter>
         </ModalContent>

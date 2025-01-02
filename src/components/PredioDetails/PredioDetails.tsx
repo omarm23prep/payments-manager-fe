@@ -10,15 +10,18 @@ import {
   Heading,
   Divider,
 } from "@chakra-ui/react";
-import { IPredioDetails } from "../../slices/predio";
+import { IPredio } from "../../slices/contribuyentes";
+
+type IPredioDetails = IPredio & { contribuyente: string };
 
 const PredioDetails: React.FC<IPredioDetails> = ({
-  propietario,
-  domicilio,
-  cuenta,
-  manzana,
-  municipio,
-  colindancias,
+  id,
+  contribuyente,
+  cuentaCatastral,
+  baseGravable,
+  fechaCelebracion,
+  fechaAdeudo,
+  direccion,
 }: IPredioDetails) => {
   return (
     <Box p={5} maxW="600px" borderWidth={1} borderRadius="lg" boxShadow="lg">
@@ -29,23 +32,27 @@ const PredioDetails: React.FC<IPredioDetails> = ({
         <Tbody>
           <Tr>
             <Td fontWeight="bold">Propietario</Td>
-            <Td>{propietario || "N/A"}</Td>
+            <Td>{contribuyente || "N/A"}</Td>
           </Tr>
           <Tr>
             <Td fontWeight="bold">Domicilio</Td>
-            <Td>{domicilio || "N/A"}</Td>
+            <Td>{direccion.direccionCompleta || "N/A"}</Td>
           </Tr>
           <Tr>
             <Td fontWeight="bold">Cuenta</Td>
-            <Td>{cuenta || "N/A"}</Td>
+            <Td>{cuentaCatastral || "N/A"}</Td>
           </Tr>
           <Tr>
-            <Td fontWeight="bold">Manzana</Td>
-            <Td>{manzana || "N/A"}</Td>
+            <Td fontWeight="bold">Base Gravable</Td>
+            <Td>{baseGravable || "N/A"}</Td>
           </Tr>
           <Tr>
-            <Td fontWeight="bold">Municipio</Td>
-            <Td>{municipio || "N/A"}</Td>
+            <Td fontWeight="bold">Fecha de Adeudo</Td>
+            <Td>{fechaAdeudo || "N/A"}</Td>
+          </Tr>
+          <Tr>
+            <Td fontWeight="bold">Fecha de Celebración</Td>
+            <Td>{fechaCelebracion || "N/A"}</Td>
           </Tr>
         </Tbody>
       </Table>
@@ -66,7 +73,11 @@ const PredioDetails: React.FC<IPredioDetails> = ({
         </Thead>
         <Tbody>
           <Tr>
-            {colindancias?.map(col => <Td>{col || "N/A"}</Td>)}
+            {/* {colindancias?.map(col => <Td>{col || "N/A"}</Td>)} */}
+            <Td>{"N/A"}</Td>
+            <Td>{"N/A"}</Td>
+            <Td>{"N/A"}</Td>
+            <Td>{"N/A"}</Td>
           </Tr>
         </Tbody>
       </Table>

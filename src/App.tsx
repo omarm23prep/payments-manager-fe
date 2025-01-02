@@ -14,7 +14,7 @@ export const App = () => {
 
   const links = [
     { name: 'Home', icon: FiHome, href: '/' },
-    { name: 'Predial', icon: FiFolder, href: '/predial' },
+    { name: 'Contribuyentes', icon: FiFolder, href: '/contribuyentes' },
     { name: 'Usuarios', icon: FiUsers, href: '/users' },
     { name: 'Configuracion', icon: FiSettings, href: '/settings'},
   ];

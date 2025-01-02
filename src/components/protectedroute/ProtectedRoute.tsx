@@ -8,7 +8,7 @@ interface ProtectedRoutesProps {
 }
 
 const ROLES_PERMISSIONS: any = {
-  "admin": ['/home', '/users', '/predial', '/orders', '/services'],
+  "admin": ['/home', '/users', '/predial', '/orders', '/services', '/contribuyentes'],
   "cashier": ['/home', '/predial', '/ordservicesers'],
   "waiter": ['/home', '/orders'],
 }
