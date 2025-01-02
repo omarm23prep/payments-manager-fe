@@ -66,45 +66,151 @@ export interface IPredio {
   eliminado?: boolean;
 }
 
-const initialState: IPredio[] = [];
+export interface IPredioHis {
+  _id: string;
+  recaudaan: number;
+  municipian: number;
+  antiguo: string | null;
+  cuenta: number;
+  folio: number;
+  propietari: string;
+  apepat: string | null;
+  apemat: string | null;
+  nombres: string | null;
+  domicilio: string;
+  vialidad: string | null;
+  calle: string | null;
+  numext: string | null;
+  numint: string | null;
+  letra: string | null;
+  col_fuh: string | null;
+  desc_cfuh: string | null;
+  c_post: string | null;
+  estado: string | null;
+  desc_econn: string | null;
+  mzna: string | null;
+  zona: string | null;
+  etapa: string | null;
+  bim_emi: number;
+  fechmov: string | null;
+  tipo_mov: string | null;
+  tipo_ope: string | null;
+  fech_cel: string | null;
+  cve_user: string | null;
+  fechrevl: string | null;
+  temp: boolean;
+  folion: number;
+  pred_mov: string | null;
+  nosirve: string | null;
+  registro: string | null;
+  medida: string | null;
+  hora_mov: string | null;
+  emision: number;
+  cuentaant: string;
+  prop_ant: string | null;
+  municipiac: number;
+  agencia: number;
+  sector: number;
+  manzana: string | null;
+  lote: number;
+  edificio: number;
+  condominio: number;
+  fech_reg: string | null;
+  rfc: string | null;
+  sexo: string | null;
+  telefono: string | null;
+  nacionalid: string | null;
+  num_solpag: string | null;
+  fec_solpag: string | null;
+  municipi_f: string | null;
+  tip_movant: number;
+  tmov_ant: string | null;
+  curp: string | null;
+  verificado: boolean;
+  id: number;
+  tomo: string | null;
+  escritura: string | null;
+  notario: string | null;
+  hash: string | null;
+  id_pad: number;
+  fecha_l: string | null;
+  usu_id: number;
+  modifica: string | null;
+  et_con_nn: string | null;
+  lote_n: string | null;
+  eliminado: boolean;
+  lote_u: string | null;
+  mzna_u: string | null;
+  modif_jur: string | null;
+  folio_seg: string | null;
+  mov_jun16: string | null;
+  obs_quin: string | null;
+}
 
-export const getPredios = createAsyncThunk(
-  "user/listAll",
-  async () => {
-    try {
-      const response = await axios.get(`${config.PAYMENTS_MANAGER_API}/predios`);
-      const prediosData = response.data;
+export interface IPredioDetails {
+  propietario?: string,
+  domicilio?: string,
+  cuenta?: string,
+  manzana?: string,
+  municipio?: string,
+  colindancias?: string[],
+}
 
-      console.log("predios response", response);
+interface PredioState {
+  predios: IPredio[];
+  loading: boolean;
+  error: string | null;
+}
 
-      return prediosData;
-    } catch (error: unknown) {
-      console.error("ERROR", error);
-    }
-  },
-);
+const initialState: PredioState = {
+  predios: [],
+  loading: false,
+  error: null,
+};
 
-const predio = createSlice({
-  name: 'predio',
-  initialState,
-  reducers: {},
-  extraReducers: {
-    [getPredios.pending.type]: (state) => {
-      return state;
-    },
-    [getPredios.fulfilled.type]: (state, action) => {
-      return [...action.payload.data];
-    },
-    [getPredios.rejected.type]: (state) => {
-      return state;
-    },
+export const getPredios = createAsyncThunk("predio/listAll", async (_, thunkAPI) => {
+  try {
+    const response = await axios.get(`${config.PAYMENTS_MANAGER_API}/predios`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching predios:", error);
+    return thunkAPI.rejectWithValue(error.response?.data || "Unknown error");
   }
 });
 
-export const selectPredioState = (state: RootState) => {
-  return state.PredioReducer;
-}
+export const getDetailsByCuenta = async (cuenta: number) => {
+  try {
+    const response = await axios.get(`${config.PAYMENTS_MANAGER_API}/predios/details/${cuenta}`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching predio by cuenta:", error);
+    throw Error("Unknown error");
+  }
+};
 
-export const { } = predio.actions;
-export default predio.reducer;
+
+const predioSlice = createSlice({
+  name: "predio",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getPredios.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPredios.fulfilled, (state, action) => {
+        state.loading = false;
+        state.predios = action.payload.data;
+      })
+      .addCase(getPredios.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+  },
+});
+
+export const selectPredioState = (state: RootState) => state.PredioReducer;
+
+export default predioSlice.reducer;
 

@@ -20,7 +20,7 @@ export const App = () => {
   ];
 
   return <ChakraProvider theme={theme}>
-    <Flex p="0px 20px">
+    <Flex p="0px 20px" w="100%" bg="gray.100">
       { !isUserLoggedIn ? <LoginPage/> :
         <Sidebar links={links} />
       }

@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ links }) => {
   );
 
   return (
-    <Box minH="100vh" bg="gray.100">
+    <Box minH="100vh" w="100%" bg="gray.100">
       {/* Mobile Navbar */}
       <Flex
         as="header"
