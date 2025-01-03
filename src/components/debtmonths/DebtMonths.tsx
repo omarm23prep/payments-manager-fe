@@ -7,7 +7,7 @@ import {
   Text,
   HStack,
 } from "@chakra-ui/react";
-import { format, addMonths, differenceInMonths } from "date-fns";
+import { format, addMonths, differenceInMonths, parse } from "date-fns";
 
 interface DebtMonth {
   date: Date;
@@ -26,8 +26,15 @@ const DebtMonths: React.FC<DebtMonthsProps> = ({
   const [debtMonths, setDebtMonths] = useState<DebtMonth[]>(() => {
     const months: DebtMonth[] = [];
     const today = new Date();
-    const startDate = new Date(fechaAdeudo || "10/09/2020");
+    const startDate = parse(fechaAdeudo || "10/09/2020", "dd/MM/yyyy", new Date());
     const dueMonths = differenceInMonths(today, startDate);
+
+    console.log("adeudo", fechaAdeudo);
+    console.log("months", months);
+    console.log("today", today);
+    console.log("start date", startDate);
+    console.log("due months", dueMonths);
+
     for (let i = 0; i < dueMonths; i++) {
       months.push({
         date: addMonths(today, -i), // Go back one month for each iteration

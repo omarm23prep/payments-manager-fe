@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Avatar,
   Button, ButtonGroup,
@@ -24,6 +24,7 @@ const NAVBAR_OPTIONS: any[] = [];
 
 const ProfileMenu = () => {
   const dispatch =  useAppDispatch();
+  const navigate = useNavigate();
 
   const { loggedUser } = useAppSelector(selectAuthState);
 
@@ -41,7 +42,15 @@ const ProfileMenu = () => {
       </MenuGroup>
       <MenuDivider />
       <MenuGroup title='Sesión'>
-        <MenuItem onClick={() => dispatch(logout())}>Cerrar Sesión</MenuItem>
+        <MenuItem onClick={async () => {
+          const response: any = await dispatch(logout());
+
+          if (response.payload.status === 200) {
+            navigate('/'); // Redirect to login page
+          }
+        }}>
+          Cerrar Sesión
+        </MenuItem>
       </MenuGroup>
     </MenuList>
   </Menu>)

@@ -10,15 +10,10 @@ export const login = createAsyncThunk(
     try {
       const response = await axios.post(`${config.PAYMENTS_MANAGER_API}/auth/login`, {
         ...credentials,
+      }, {
+        withCredentials: true,
       });
 
-      console.log("env var", config.PAYMENTS_MANAGER_API);
-
-      // const response = await axios.post("http://localhost:3001/auth/login", {
-      //   ...credentials,
-      // });
-
-      console.log("data", response.data);
       return response.data;
     } catch (error: unknown) {
       console.error("ERROR WHEN LOGGING USER", error);
@@ -29,10 +24,13 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async () => {
     try {
-      const response = await axios.post(`${config.PAYMENTS_MANAGER_API}/auth/logout`);
-      console.log("data", response.data);
-    } catch (error: unknown) {
+      const response = await axios.post(`${config.PAYMENTS_MANAGER_API}/auth/logout`, {}, {
+        withCredentials: true
+      });
 
+      return response.data;
+    } catch (error: unknown) {
+      console.error(error);
     }
   }
 )
@@ -77,6 +75,7 @@ const auth = createSlice({
       return state;
     },
     [logout.fulfilled.type]: (state) => {
+
       return {
         ...state,
         isUserLoggedIn: false,

@@ -14,8 +14,6 @@ export interface IUser {
   isAuthenticated?: boolean,
 }
 
-type UserModel = IUser & { _id: string };
-
 export interface Credentials {
   username: string,
   password: string,
@@ -90,9 +88,9 @@ export const getUsers = createAsyncThunk(
       const response = await axios.get(`${config.PAYMENTS_MANAGER_API}/users`);
       const usersData = response.data.data;
 
-      return usersData.map((user: UserModel ) => {
+      return usersData.map((user: IUser ) => {
         return {
-          id: user._id,
+          id: user.id,
           fullname: user.fullname,
           username: user.username,
           password: "*********",
